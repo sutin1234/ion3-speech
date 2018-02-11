@@ -1,14 +1,17 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>
-      Ionic Blank
-    </ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <ion-title>
+            Ionic Blank
+        </ion-title>
+    </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+    {{ data | json }}
+    <ion-fab right bottom>
+        <button ion-fab color="danger" (click)="startSpeech()">
+      <ion-icon name="mic"></ion-icon>
+    </button>
+    </ion-fab>
+
 </ion-content>

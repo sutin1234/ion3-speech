@@ -1,0 +1,37 @@
+<ion-header>
+
+    <ion-navbar color="danger">
+        <ion-title>duration: {{ duration }}</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+    <ion-list>
+        <ion-item detail-push no-lines *ngFor="let audio of audioList; index as i;">
+            <ion-avatar item-start>
+                <img src="https://i.ytimg.com/vi/fUWrhetZh9M/maxresdefault.jpg">
+            </ion-avatar>
+            <h2>Cher</h2>
+            <p>ข้อความเสียง {{audio.duration}} วินาที </p>
+
+            <button ion-button clear item-end (click)="playAudio(audio.filename, i)">
+          <ion-icon name="play"></ion-icon>
+        </button>
+        </ion-item>
+    </ion-list>
+    <ion-item class="bottom">
+        <ion-input type="text" placeholder="เขียนอะไรสักหน่อย">
+        </ion-input>
+        <button ion-button icon-only clear item-right (click)="startRecord()" *ngIf="!recording">
+
+
+      <ion-icon name="mic"></ion-icon>
+    </button>
+        <button ion-button icon-only clear item-right (click)="stopRecord()" *ngIf="recording" class="stop">
+      <ion-icon name="mic-off"></ion-icon>
+    </button>
+    </ion-item>
+
+</ion-content>

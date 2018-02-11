@@ -1,0 +1,16 @@
+page-audio-record {
+    .bottom {
+        position: fixed;
+        bottom: 5px;
+    }
+    ion-input {
+        width: 80% !important;
+    }
+    .stop {
+        color: red;
+    }
+    .lines {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+}
