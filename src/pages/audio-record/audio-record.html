@@ -9,24 +9,29 @@
 
 <ion-content>
     <ion-list>
-        <ion-item detail-push no-lines *ngFor="let audio of audioList; index as i;">
+
+        <ion-item detail-push no-lines *ngFor="let audio of audioItems | async ; index as i;">
+
             <ion-avatar item-start>
                 <img src="https://i.ytimg.com/vi/fUWrhetZh9M/maxresdefault.jpg">
             </ion-avatar>
-            <h2>Cher</h2>
-            <p>ข้อความเสียง {{audio.duration}} วินาที </p>
+            <h2>{{audio.audioName}}</h2>
+            <p>time left: {{audio.audioDuration}} sec. </p>
+            <p>send date: {{audio.audioCreate | date: 'HH:mm:ss'}} </p>
+            <p>
+                {{audio | json }}
+            </p>
+            <button ion-button clear item-end (click)="playAudio(audio)">
 
-            <button ion-button clear item-end (click)="playAudio(audio.filename, i)">
-          <ion-icon name="play"></ion-icon>
-        </button>
+      </button>
         </ion-item>
+
+
     </ion-list>
     <ion-item class="bottom">
         <ion-input type="text" placeholder="เขียนอะไรสักหน่อย">
         </ion-input>
         <button ion-button icon-only clear item-right (click)="startRecord()" *ngIf="!recording">
-
-
       <ion-icon name="mic"></ion-icon>
     </button>
         <button ion-button icon-only clear item-right (click)="stopRecord()" *ngIf="recording" class="stop">
