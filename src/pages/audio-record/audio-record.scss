@@ -13,4 +13,11 @@ page-audio-record {
         padding: 0 !important;
         margin: 0 !important;
     }
+    ion-icon {
+        vertical-align: middle;
+    }
+    .duration-right {
+        position: fixed;
+        right: 5px;
+    }
 }

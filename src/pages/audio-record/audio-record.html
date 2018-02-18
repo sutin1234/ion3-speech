@@ -1,7 +1,10 @@
 <ion-header>
 
     <ion-navbar color="danger">
-        <ion-title>duration: {{ duration }}</ion-title>
+        <ion-title>
+            <ion-icon name="microphone"></ion-icon> Audio Recorder
+            <span class="duration-right">duration: {{ duration }} </span>
+        </ion-title>
     </ion-navbar>
 
 </ion-header>
@@ -18,18 +21,15 @@
             <h2>{{audio.audioName}}</h2>
             <p>time left: {{audio.audioDuration}} sec. </p>
             <p>send date: {{audio.audioCreate | date: 'HH:mm:ss'}} </p>
-            <p>
-                {{audio | json }}
-            </p>
             <button ion-button clear item-end (click)="playAudio(audio)">
-
+        <ion-icon name="play"></ion-icon>
       </button>
         </ion-item>
 
 
     </ion-list>
     <ion-item class="bottom">
-        <ion-input type="text" placeholder="เขียนอะไรสักหน่อย">
+        <ion-input type="text" placeholder="write some thing...">
         </ion-input>
         <button ion-button icon-only clear item-right (click)="startRecord()" *ngIf="!recording">
       <ion-icon name="mic"></ion-icon>

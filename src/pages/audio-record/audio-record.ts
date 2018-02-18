@@ -107,6 +107,23 @@ export class AudioRecordPage {
    }, 1000);
   }
   playAudio(audioFile: Item) {
+    console.log(audioFile);
+    let audio = new Audio(audioFile.audioUploadUrl);
+    audio.play();
+
+    audio.oncanplay = () => {
+      console.log('audio played');
+    }
+    audio.onended = () => {
+      console.log('audio ended');
+    }
+    audio.onprogress = () => {
+      console.log('audio onprogress');
+    }
+    audio.ondurationchange = (e) => {
+      let duration: number =  parseInt(audio.duration.toFixed());
+      console.log('durationChanged: ', duration--)
+    }
   }
 
   removeAudioFile(path, fileName) {
