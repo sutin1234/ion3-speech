@@ -7,6 +7,7 @@ import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/fires
 import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
 import { AudioProvider } from 'ionic-audio';
+import { ImagePicker, ImagePickerOptions } from '@ionic-native/image-picker';
 
 export interface Item {
   audioName?: string,
@@ -19,7 +20,7 @@ export interface Item {
 @Component({
   selector: 'page-audio-record',
   templateUrl: 'audio-record.html',
-  providers: [Media, File]
+  providers: [Media, File, ImagePicker]
 })
 export class AudioRecordPage {
   recording: boolean = false;
@@ -36,7 +37,8 @@ export class AudioRecordPage {
   constructor(public navCtrl: NavController,
               public navParams: NavParams, private media: Media,
               private file: File, public platform: Platform,
-              private _firestore: AngularFirestore, private _audioProvider: AudioProvider) {
+              private _firestore: AngularFirestore, private _audioProvider: AudioProvider,
+              private imagePicker: ImagePicker) {
 
     this.audioCollections = _firestore.collection<Item>('voice_collections');
     this.audioItems = this.audioCollections.valueChanges();
@@ -85,14 +87,15 @@ export class AudioRecordPage {
     this.getAudioList();
 
 
-    this.startUploadAudio(audioData.audioName).then(fileURL => {
-      console.log('upload files OK')
+    this.uploadWithArrayBuffer(audioData.audioName).then(fileURL => {
+      console.log('upload files OK', fileURL)
       audioData.audioUploadUrl = fileURL;
       this.addFirebase(audioData);
 
       this.removeAudioFile(this.file.externalDataDirectory, audioData.audioName).then(fileRemove => {
         console.log('remove files OK')
       })
+
 
     });
 
@@ -152,4 +155,56 @@ export class AudioRecordPage {
     });
 
   }
+  uploadWithDataURL(fileName: string): Promise<any>{
+      return new Promise((resolve, reject) => {
+      let storageRef = firebase.storage().ref();
+      this.file.readAsDataURL(this.file.externalDataDirectory, fileName).then((file) => {
+        let voiceRef = storageRef.child('voices/'+fileName).putString(file, firebase.storage.StringFormat.DATA_URL);
+        voiceRef.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
+          console.log("uploading");
+        }, (e) => {
+          reject(e)
+          console.log(JSON.stringify(e, null, 2));
+        }, () => {
+          var downloadURL = voiceRef.snapshot.downloadURL;
+          resolve(downloadURL);
+        });
+      });
+    });
+  }
+  uploadWithArrayBuffer(fileName: string): Promise<any>{
+      return new Promise((resolve, reject) => {
+      let storageRef = firebase.storage().ref();
+      this.file.readAsArrayBuffer(this.file.externalDataDirectory, fileName).then((file) => {
+        console.log(JSON.stringify(file))
+        let voiceRef = storageRef.child('voices/'+fileName).put(file);
+        voiceRef.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
+          console.log("uploading");
+        }, (e) => {
+          reject(e)
+          console.log(JSON.stringify(e, null, 2));
+        }, () => {
+          var downloadURL = voiceRef.snapshot.downloadURL;
+          resolve(downloadURL);
+        });
+      });
+    });
+  }
+  openImagePiker(){
+      let imageOptions: ImagePickerOptions = {
+        quality: 100,
+        maximumImagesCount: 10,
+        outputType: 0
+      }
+      this.imagePicker.requestReadPermission().then(() => {
+        this.imagePicker.hasReadPermission().then(() => {
+          this.imagePicker.getPictures(imageOptions).then((results) => {
+            for (var i = 0; i < results.length; i++) {
+                console.log('Image URI: ' + results[i]);
+            }
+          }, (err) => console.log(JSON.stringify(err)));
+        });
+      });
+
+    }
 }

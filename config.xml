@@ -90,4 +90,7 @@
     <plugin name="cordova-plugin-file" spec="^6.0.1" />
     <plugin name="com.hutchind.cordova.plugins.streamingmedia" />
     <plugin name="cordova-plugin-nativeaudio" spec="^3.0.9" />
+    <plugin name="com.synconset.imagepicker">
+        <variable name="PHOTO_LIBRARY_USAGE_DESCRIPTION" value="images picker" />
+    </plugin>
 </widget>

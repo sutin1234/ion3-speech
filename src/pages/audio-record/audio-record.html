@@ -31,6 +31,9 @@
     <ion-item class="bottom">
         <ion-input type="text" placeholder="write some thing...">
         </ion-input>
+        <button ion-button icon-only clear item-right (click)="openImagePiker()">
+      <ion-icon name="image"></ion-icon>
+    </button>
         <button ion-button icon-only clear item-right (click)="startRecord()" *ngIf="!recording">
       <ion-icon name="mic"></ion-icon>
     </button>
