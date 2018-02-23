@@ -28,6 +28,11 @@
         </ion-item>
     </ion-list>
     <img [src]="imageBlob" *ngIf="imageBlob">
+
+    <video width="320" height="240" controls *ngIf="videoBlob">
+    <source [src]="videoBlob" [type]="videoType">
+  </video>
+
     <ion-item class="bottom">
         <ion-input type="text" placeholder="write some thing...">
         </ion-input>

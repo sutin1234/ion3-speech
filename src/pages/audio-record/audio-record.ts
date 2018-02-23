@@ -34,6 +34,8 @@ export class AudioRecordPage {
   interval: any;
   duration: number = 0;
   imageBlob: any;
+  videoBlob: any;
+  videoType: any;
 
   audioItems: Observable<Item[]>;
   audioCollections: AngularFirestoreCollection<Item>;
@@ -214,23 +216,51 @@ export class AudioRecordPage {
       */
      this.captureFile().then(nativeFilePath => {
        alert(nativeFilePath)
-       this.readArrayBufferedAndMakeBlob(nativeFilePath);
+       this.readArrayBufferedAndMakeBlob(nativeFilePath).then(data => {
+         alert(data.type)
+         switch(data.type) {
+            case "image/png" : this.imageUploadWithBlobFile(data.imageBlob).then(URL => {
+              this.imageBlob =  URL;
+            }); break;
+            case "image/jpg" : this.imageUploadWithBlobFile(data.imageBlob).then(URL => {
+              this.imageBlob =  URL;
+            }); break;
+            case "image/jpeg" : this.imageUploadWithBlobFile(data.imageBlob).then(URL => {
+              this.imageBlob =  URL;
+            }); break;
+            case "image/gif" : this.imageUploadWithBlobFile(data.imageBlob).then(URL => {
+              this.imageBlob =  URL;
+            }); break;
+            case "image/bmp" : this.imageUploadWithBlobFile(data.imageBlob).then(URL => {
+              this.imageBlob =  URL;
+            }); break;
+            case "video/mp4" : this.videoUploadWithBlobFile(data.imageBlob).then(URL => {
+              this.videoType = data.type;
+              this.videoBlob =  URL;
+            }); break;
+            default: alert('file type not image');
+         }
+       });
      })
     }
-  readArrayBufferedAndMakeBlob(file) {
-    (<any>window).resolveLocalFileSystemURL(file, (res) => {
-      res.file((resFile) => {
-        var reader = new FileReader();
-        reader.readAsArrayBuffer(resFile);
-        reader.onload = (evt: any) => {
-          var imgBlob = new Blob([evt.target.result], { type: 'image/png'});
-          let upload = this.uploadWithBlobFile(imgBlob);
-          upload.then(imageURL => {
-            this.imageBlob = imageURL;
+  readArrayBufferedAndMakeBlob(file): Promise<any> {
+      return new Promise((resolve, reject) => {
+       (<any>window).resolveLocalFileSystemURL(file, (res) => {
+            res.file((resFile) => {
+              var reader = new FileReader();
+              reader.readAsArrayBuffer(resFile);
+              reader.onload = (evt: any) => {
+                var imgBlob = new Blob([evt.target.result], {type: resFile.type});
+                let data = {
+                  type: resFile.type,
+                  imageBlob: imgBlob
+                }
+                resolve(data)
+              }
+            })
           })
-        }
-      })
-    })
+      });
+
 
     }
   captureFile(): Promise<any> {
@@ -248,10 +278,27 @@ export class AudioRecordPage {
         });
 
     }
-    uploadWithBlobFile(blobFile) {
+    imageUploadWithBlobFile(blobFile) {
       return new Promise((resolve, reject) => {
       let storageRef = firebase.storage().ref();
        let voiceRef = storageRef.child('photo_voice/'+new Date().getTime()+'.png').put(blobFile);
+        voiceRef.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
+          console.log("uploading");
+        }, (e) => {
+          reject(e);
+          console.log(JSON.stringify(e, null, 2));
+        }, () => {
+          var downloadURL = voiceRef.snapshot.downloadURL;
+          console.log('success uploaded: '+ downloadURL)
+          resolve(downloadURL);
+        });
+      });
+    }
+
+    videoUploadWithBlobFile(blobFile) {
+      return new Promise((resolve, reject) => {
+      let storageRef = firebase.storage().ref();
+       let voiceRef = storageRef.child('video_voice/'+new Date().getTime()+'.png').put(blobFile);
         voiceRef.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
           console.log("uploading");
         }, (e) => {
