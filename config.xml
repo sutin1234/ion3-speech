@@ -93,4 +93,6 @@
     <plugin name="com.synconset.imagepicker">
         <variable name="PHOTO_LIBRARY_USAGE_DESCRIPTION" value="images picker" />
     </plugin>
+    <plugin name="cordova-plugin-filechooser" spec="^1.0.1" />
+    <plugin name="cordova-plugin-filepath" spec="^1.2.0" />
 </widget>
