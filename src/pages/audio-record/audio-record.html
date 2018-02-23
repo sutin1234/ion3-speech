@@ -18,16 +18,16 @@
             <ion-avatar item-start>
                 <img src="https://i.ytimg.com/vi/fUWrhetZh9M/maxresdefault.jpg">
             </ion-avatar>
-            <h2>{{audio.audioName}}</h2>
-            <p>time left: {{audio.audioDuration}} sec. </p>
-            <p>send date: {{audio.audioCreate | date: 'HH:mm:ss'}} </p>
+            <ion-range min="100" max="200" color="danger">
+                <ion-label range-left>-200</ion-label>
+                <ion-label range-right>200</ion-label>
+            </ion-range>
             <button ion-button clear item-end (click)="playAudio(audio)">
         <ion-icon name="play"></ion-icon>
       </button>
         </ion-item>
-
-
     </ion-list>
+    <img [src]="imageBlob" *ngIf="imageBlob">
     <ion-item class="bottom">
         <ion-input type="text" placeholder="write some thing...">
         </ion-input>

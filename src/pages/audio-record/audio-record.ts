@@ -8,6 +8,9 @@ import { Observable } from 'rxjs/Observable';
 import * as firebase from 'firebase';
 import { AudioProvider } from 'ionic-audio';
 import { ImagePicker, ImagePickerOptions } from '@ionic-native/image-picker';
+import { FileChooser } from '@ionic-native/file-chooser';
+import { FilePath } from '@ionic-native/file-path';
+import { IonicNativePlugin } from '@ionic-native/core';
 
 export interface Item {
   audioName?: string,
@@ -20,7 +23,7 @@ export interface Item {
 @Component({
   selector: 'page-audio-record',
   templateUrl: 'audio-record.html',
-  providers: [Media, File, ImagePicker]
+  providers: [Media, File, ImagePicker, FileChooser, FilePath]
 })
 export class AudioRecordPage {
   recording: boolean = false;
@@ -30,6 +33,7 @@ export class AudioRecordPage {
   audioList: any[] = [];
   interval: any;
   duration: number = 0;
+  imageBlob: any;
 
   audioItems: Observable<Item[]>;
   audioCollections: AngularFirestoreCollection<Item>;
@@ -38,7 +42,8 @@ export class AudioRecordPage {
               public navParams: NavParams, private media: Media,
               private file: File, public platform: Platform,
               private _firestore: AngularFirestore, private _audioProvider: AudioProvider,
-              private imagePicker: ImagePicker) {
+              private imagePicker: ImagePicker, private fileChooser: FileChooser,
+              private _filePath: FilePath) {
 
     this.audioCollections = _firestore.collection<Item>('voice_collections');
     this.audioItems = this.audioCollections.valueChanges();
@@ -191,6 +196,7 @@ export class AudioRecordPage {
     });
   }
   openImagePiker(){
+    /*
       let imageOptions: ImagePickerOptions = {
         quality: 100,
         maximumImagesCount: 10,
@@ -205,6 +211,57 @@ export class AudioRecordPage {
           }, (err) => console.log(JSON.stringify(err)));
         });
       });
+      */
+     this.captureFile().then(nativeFilePath => {
+       alert(nativeFilePath)
+       this.readArrayBufferedAndMakeBlob(nativeFilePath);
+     })
+    }
+  readArrayBufferedAndMakeBlob(file) {
+    (<any>window).resolveLocalFileSystemURL(file, (res) => {
+      res.file((resFile) => {
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(resFile);
+        reader.onload = (evt: any) => {
+          var imgBlob = new Blob([evt.target.result], { type: 'image/png'});
+          let upload = this.uploadWithBlobFile(imgBlob);
+          upload.then(imageURL => {
+            this.imageBlob = imageURL;
+          })
+        }
+      })
+    })
 
+    }
+  captureFile(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.fileChooser.open().then((uri) => {
+                this._filePath.resolveNativePath(uri).then((nativeFilePath) => {
+                      resolve(nativeFilePath);
+                    }, (err) => {
+                        reject(err);
+                    })
+            }, (err) => {
+                reject(err);
+            });
+
+        });
+
+    }
+    uploadWithBlobFile(blobFile) {
+      return new Promise((resolve, reject) => {
+      let storageRef = firebase.storage().ref();
+       let voiceRef = storageRef.child('photo_voice/'+new Date().getTime()+'.png').put(blobFile);
+        voiceRef.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
+          console.log("uploading");
+        }, (e) => {
+          reject(e);
+          console.log(JSON.stringify(e, null, 2));
+        }, () => {
+          var downloadURL = voiceRef.snapshot.downloadURL;
+          console.log('success uploaded: '+ downloadURL)
+          resolve(downloadURL);
+        });
+      });
     }
 }
